@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Market Simulator v2.2</title>
+    <title>Stock Market Simulator v2.3 (Bug Fix)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -309,11 +309,11 @@
 
         function pauseGame() {
             if (!gameState.isRunning) return;
+            clearInterval(gameState.gameInterval);
             gameState.isRunning = false;
             startPauseBtn.textContent = 'Resume';
             startPauseBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
             startPauseBtn.classList.add('bg-green-500', 'hover:bg-green-600');
-            clearInterval(gameState.gameInterval);
         }
 
         function resetGame() {
@@ -339,8 +339,17 @@
 
         resetBtn.addEventListener('click', resetGame);
         
+        // BUG FIX: The event listener for the time slider is updated to be more robust.
         timeSlider.addEventListener('input', (e) => {
-            if (gameState.isRunning) pauseGame();
+            // When the user interacts with the slider, we must stop the automatic timer.
+            if (gameState.isRunning) {
+                clearInterval(gameState.gameInterval);
+                gameState.isRunning = false;
+                startPauseBtn.textContent = 'Resume';
+                startPauseBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+                startPauseBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+            }
+            // Now, update the display to the time selected by the user.
             gameState.currentTimeIndex = parseInt(e.target.value, 10);
             updateDisplay();
         });
